@@ -1,9 +1,12 @@
 name: ${COMPOSE_PROJECT_NAME:-realtime-service}
 
 services:
-
-volumes:
-
-networks:
-  iot-hub-nw:
-    external: true
+  realtime:
+    build:
+      context: ..
+      dockerfile: docker/python/Dockerfile
+    env_file:
+      - ../.env
+    ports:
+      - "8002:8000"
+    restart: unless-stopped
