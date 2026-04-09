@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-# сopy requirements & install dependencies
 COPY ./requirements.txt /app/requirements.txt
 
 RUN python -m pip install --upgrade pip wheel \
@@ -26,27 +25,27 @@ RUN python -m pip install --upgrade pip wheel \
 
 FROM base AS runtime-deps-stage
 
-# install runtime dependencies
 RUN apt-get update && apt-get install --no-install-recommends -y \
     libpq5 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build-stage /wheels /wheels
-COPY --from=build-stage /app/requirements.txt /app/requirements.txt
 
 RUN python -m pip install --no-index /wheels/* \
-    && rm -rf /wheels /app/requirements.txt
+    && rm -rf /wheels
 
 
 FROM runtime-deps-stage AS run-stage
 
-# create user with limited permissions
 RUN addgroup --gid 10001 --system python && \
     adduser --no-create-home --shell /bin/false \
-    --disabled-password --uid 10001 --system --group python
+    --disabled-password --uid 10001 --system --group python && \
+    mkdir -p /home/python && chown python:python /home/python
 
-# copy application files
+ENV HOME=/home/python
+
 COPY --chown=python:python ./src/ /app/
 
-# switch to created user
 USER python
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
