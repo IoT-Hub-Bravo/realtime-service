@@ -30,17 +30,19 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build-stage /wheels /wheels
-COPY --from=build-stage /app/requirements.txt /app/requirements.txt
 
 RUN python -m pip install --no-index /wheels/* \
-    && rm -rf /wheels /app/requirements.txt
+    && rm -rf /wheels
 
 
 FROM runtime-deps-stage AS run-stage
 
 RUN addgroup --gid 10001 --system python && \
     adduser --no-create-home --shell /bin/false \
-    --disabled-password --uid 10001 --system --group python
+    --disabled-password --uid 10001 --system --group python && \
+    mkdir -p /home/python && chown python:python /home/python
+
+ENV HOME=/home/python
 
 COPY --chown=python:python ./src/ /app/
 
