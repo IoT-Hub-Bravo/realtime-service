@@ -8,4 +8,5 @@ prometheus-client==0.24.1
 httpx==0.28.1
 pytest==8.3.5
 pytest-asyncio==0.25.3
+pytest-cov==6.1.0
 iot-hub-shared @ git+https://github.com/IoT-Hub-Bravo/python-service-libs.git

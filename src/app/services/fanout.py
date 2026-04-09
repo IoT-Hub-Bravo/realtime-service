@@ -36,6 +36,4 @@ async def fanout_telemetry(message: dict) -> None:
                 logger.warning("Failed to send to client, removing subscription")
                 await manager.unsubscribe(ws)
 
-    logger.debug(
-        "Fanout complete: device=%s, clients=%d", device_serial_id, len(sent_to)
-    )
+    logger.debug("Fanout complete: device=%s, clients=%d", device_serial_id, len(sent_to))

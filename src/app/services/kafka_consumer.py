@@ -16,12 +16,14 @@ class TelemetryKafkaConsumer:
         self._consumer = None
 
     def _create_consumer(self) -> Consumer:
-        return Consumer({
-            "bootstrap.servers": settings.KAFKA_BOOTSTRAP_SERVERS,
-            "group.id": settings.KAFKA_GROUP_ID,
-            "auto.offset.reset": "latest",
-            "enable.auto.commit": True,
-        })
+        return Consumer(
+            {
+                "bootstrap.servers": settings.KAFKA_BOOTSTRAP_SERVERS,
+                "group.id": settings.KAFKA_GROUP_ID,
+                "auto.offset.reset": "latest",
+                "enable.auto.commit": True,
+            }
+        )
 
     async def start(self) -> None:
         self._running = True
@@ -38,9 +40,7 @@ class TelemetryKafkaConsumer:
         loop = asyncio.get_event_loop()
         while self._running:
             try:
-                msg = await loop.run_in_executor(
-                    None, lambda: self._consumer.poll(1.0)
-                )
+                msg = await loop.run_in_executor(None, lambda: self._consumer.poll(1.0))
                 if msg is None:
                     continue
                 if msg.error():
